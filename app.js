@@ -17,6 +17,7 @@ var wss = new WebSocketServer({server: server});
 var serviceBusService = azure.createServiceBusService(config.sbConnectionString);
 
 wss.on('connection', function(ws) {
+  var loop = setInterval(function() {
     serviceBusService.receiveSubscriptionMessage(config.sbTopic, config.sbSubscription, function(error, receivedMessage) {
       if(!error) {
          ws.send(receivedMessage.body);
@@ -24,4 +25,5 @@ wss.on('connection', function(ws) {
         console.log("Error: " + error);
       }
     });
+  }, 500);
 });
