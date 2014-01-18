@@ -10,7 +10,8 @@ var path = require('path'),
 app.use(express.static(__dirname + '/public'));
 
 var server = http.createServer(app);
-server.listen({port:process.env.PORT});
+server.listen(process.env.PORT);
+//server.listen(9999);
 
 var wss = new WebSocketServer({server: server});
 
