@@ -9,9 +9,9 @@ var path = require('path'),
 
 app.use(express.static(__dirname + '/public'));
 
-var server = http.createServer(app);
+//var server = http.createServer(app);
 server.listen(process.env.PORT);
-//server.listen(9999);
+server.listen(9999);
 
 var wss = new WebSocketServer({server: server});
 
@@ -20,7 +20,7 @@ var serviceBusService = azure.createServiceBusService(config.sbConnectionString)
 wss.on('connection', function(ws) {
     serviceBusService.receiveSubscriptionMessage(config.sbTopic, config.sbSubscription, function(error, receivedMessage) {
       if(!error) {
-         ws.send(Buffer(receivedMessage.body));
+         ws.send(receivedMessage.body);
       } else {
         console.log("Error: " + error);
       }
