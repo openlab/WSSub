@@ -10,7 +10,7 @@ var express = require('express'),
   azure = require('azure'),
   WebSocketServer = require('ws').Server;
 
-var wss = new WebSocketServer();
+var wss = new WebSocketServer({port:80});
 
 var serviceBusService = azure.createServiceBusService(config.sbConnectionString);
 
