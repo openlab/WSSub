@@ -1,9 +1,6 @@
-//require('newrelic');
-var http = require('http'),
-  path = require('path'),
+var path = require('path'),
   util = require('util'),
   config = require('./config'),
-  server = require('http').createServer(app),
   azure = require('azure'),
   WebSocketServer = require('ws').Server;
 
@@ -20,7 +17,7 @@ function getMessage() {
       if(!error) {
          ws.send(Buffer(receivedMessage.body));
       } else {
-        console.log("Error recieving message: " + error);
+        console.log("Error: " + error);
       }
       getMessage();
     });
