@@ -8,7 +8,9 @@ var express = require('express'),
   config = require('./config'),
   server = require('http').createServer(app),
   azure = require('azure'),
-  io = require('socket.io').listen(server);
+  WebSocketServer = require('ws').Server;
+
+var wss = new WebSocketServer();
 
 var serviceBusService = azure.createServiceBusService(config.sbConnectionString);
 
@@ -36,59 +38,23 @@ app.get('/', function(req, res) {
 });
 
 // Handle 'connection' events
-io.sockets.on('connection', function(socket) {
-  socket.emit('fromServer', {
-    message: 'Connected!  There are now ' + io.sockets.clients().length + ' clients connected.'
-  });
-
-  currentSockets.push(socket);
-
-  //setInterval(function() { sendSampleMessage(socket) }, 5000);
-  socket.on('message', function(data) {
-    socket.emit('message', {
-      message: 'I sent: ' + data.message
-    });
-    socket.broadcast.emit('message', {
-      message: data.message
-    });
-  });
-
+wss.on('connection', function(ws) {
+  ws.send("Welcome");
 });
 
 server.listen(app.get('port'), function() {
   console.log("Express server listening on port " + app.get('port'));
 });
 
-function sendSampleMessage(socket) {
-  var msg = sample.getSample();
-  socket.emit('fromServer', {
-    message: msg
-  });
-}
-
-
 function getMessage() {
-  if(currentSockets.length > 0) {
     serviceBusService.receiveSubscriptionMessage(config.sbTopic, config.sbSubscription, function(error, receivedMessage) {
       if(!error) {
-        for(var i = currentSockets.length - 1; i >= 0; i--) {
-          console.log("[" + i + "] writing " + receivedMessage.body );
-         var copy = new Buffer(receivedMessage.body);
-
-          currentSockets[i].emit('fromServer', {
-            message: copy
-          });
-        };
+         ws.send(Buffer(receivedMessage.body));
       } else {
-        console.log("Error recieving message");
-        console.log(error);
+        console.log("Error recieving message: " + error);
       }
-
       getMessage();
     });
-  } else {
-    setTimeout(getMessage, 3000);
-  }
 }
 
 getMessage();
