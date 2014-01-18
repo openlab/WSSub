@@ -84,6 +84,9 @@
 
                             Socket.onmessage = function( evt )
                             {
+				// bdo
+				console.log(evt.data);
+				console.log(JSON.parse(evt.data));
                                 if( evt.data instanceof ArrayBuffer )
                                     stations.update( EwMsgEval( evt.data ) );
                             }
